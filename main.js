@@ -1,8 +1,12 @@
 "use strict";
 const PRECISION = 5;
 const TEST_ISENTROPIC = false;
-const TEST_NORMAL_SHOCK = true;
-const TEST_OBLIQUE_SHOCK = false;
+const TEST_NORMAL_SHOCK = false;
+const TEST_OBLIQUE_SHOCK = true;
+const deflection_tolerance = 0.001;
+const epsilon = 0.00001;
+const epsilon_derivative = 0.001;
+const step = 0.1;
 class Isentropic {
     static Tt_by_T(M, gamma) {
         return 1 + ((gamma - 1) * 0.5) * M * M;
@@ -123,4 +127,63 @@ class ObliqueShock {
         const rho2byrho1 = ObliqueShock.RHO2_by_RHO1(M1, beta, gamma);
         return p2byb1 / rho2byrho1;
     }
+    static find_max_deflection_angle(M1, gamma) {
+        const t1 = (gamma + 1) / (4 * gamma);
+        const t2_0 = -1 / (gamma * M1 * M1);
+        const t2_11 = gamma + 1;
+        const t2_12 = 1 + 0.5 * (gamma - 1) * M1 * M1 + (gamma + 1) * Math.pow(M1, 4) / 16;
+        const t2_1 = Math.sqrt(t2_11 * t2_12);
+        const t = t1 + t2_0 * (1 - t2_1);
+        return Math.asin(Math.sqrt(t));
+    }
+    static find_shock_angle_solutions(M1, gamma, deflection) {
+        // const lhs = Math.tan(deflection);
+        // const max_deflection = ObliqueShock.find_max_deflection_angle(M1, gamma);
+        // if( )
+        let P1 = Math.PI / 2 - epsilon;
+        let P2 = Math.asin(1 / M1) + epsilon;
+        let P1_final = P1;
+        let P2_final = P2;
+        for (let i = 0; i < 10000; i++) {
+            const f1 = ObliqueShock.deflectionAngle(M1, P1, gamma);
+            const f2 = ObliqueShock.deflectionAngle(M1, P1 - epsilon, gamma);
+            const deriv_deflection = (f2 - f1) / epsilon;
+            const P1_new = P1 - step * (deflection - f1) / deriv_deflection;
+            const new_deflection = ObliqueShock.deflectionAngle(M1, P1_new, gamma);
+            if (Math.abs(new_deflection - deflection) < deflection_tolerance) {
+                P1_final = P1;
+                break;
+            }
+            P1 = P1_new;
+        }
+        for (let i = 0; i < 10000; i++) {
+            const f1 = ObliqueShock.deflectionAngle(M1, P2, gamma);
+            const f2 = ObliqueShock.deflectionAngle(M1, P2 + epsilon, gamma);
+            const deriv_deflection = (f2 - f1) / epsilon;
+            const P2_new = P2 + step * (deflection - f1) / deriv_deflection;
+            const new_deflection = ObliqueShock.deflectionAngle(M1, P2_new, gamma);
+            if (Math.abs(new_deflection - deflection) < deflection_tolerance) {
+                P2_final = P2;
+                break;
+            }
+            P2 = P2_new;
+        }
+        if (Math.abs(P1_final - P2_final) < deflection_tolerance) {
+            const average = (P1_final + P2_final) / 2;
+            P1_final = average;
+            P2_final = average;
+        }
+        return [P1_final, P2_final];
+    }
+}
+if (TEST_OBLIQUE_SHOCK) {
+    console.log("\nOblique Shock test");
+    const M1 = 2.0;
+    const gamma = 1.4;
+    const deflection = 20 * Math.PI / 180;
+    const [beta_weak, beta_strong] = ObliqueShock.find_shock_angle_solutions(M1, gamma, deflection);
+    console.log("M1 = ", M1);
+    console.log("Deflection (deg) = ", (deflection * 180 / Math.PI).toFixed(PRECISION));
+    console.log("Weak Shock Angle (deg) = ", (beta_weak * 180 / Math.PI).toFixed(PRECISION));
+    console.log("Strong Shock Angle (deg) = ", (beta_strong * 180 / Math.PI).toFixed(PRECISION));
 }

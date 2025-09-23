@@ -1,7 +1,7 @@
 const PRECISION = 5;
 const TEST_ISENTROPIC = false;
-const TEST_NORMAL_SHOCK = true;
-const TEST_OBLIQUE_SHOCK = false;
+const TEST_NORMAL_SHOCK = false;
+const TEST_OBLIQUE_SHOCK = true;
 const deflection_tolerance = 0.001;
 const epsilon = 0.00001;
 const epsilon_derivative = 0.001;
@@ -185,6 +185,19 @@ class ObliqueShock{
     }
     return [P1_final, P2_final];
   }
+}
+
+
+if(TEST_OBLIQUE_SHOCK){
+  console.log("\nOblique Shock test");
+  const M1 = 2.0;
+  const gamma = 1.4;
+  const deflection = 20 * Math.PI/180;
+  const [beta_weak, beta_strong] = ObliqueShock.find_shock_angle_solutions(M1, gamma, deflection);
+  console.log("M1 = ", M1);
+  console.log("Deflection (deg) = ", (deflection*180/Math.PI).toFixed(PRECISION));
+  console.log("Weak Shock Angle (deg) = ", (beta_weak*180/Math.PI).toFixed(PRECISION));
+  console.log("Strong Shock Angle (deg) = ", (beta_strong*180/Math.PI).toFixed(PRECISION));
 }
 
 
