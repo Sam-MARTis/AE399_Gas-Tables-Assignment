@@ -47,7 +47,7 @@ class Isentropic {
     }
 }
 class NormalShock {
-    static DownStreamMachNumber(M1, gamma) {
+    static downStreamMachNumber(M1, gamma) {
         const t1 = (gamma - 1);
         const m1sq = M1 * M1;
         const m2sq = (t1 * m1sq + 2) / (2 * gamma * m1sq - t1);
@@ -81,12 +81,12 @@ class NormalShock {
         return t1f * t2f;
     }
     static P1_by_Pt2(M1, gamma) {
-        return (1 / (NormalShock.P2_by_P1(M1, gamma)) / Isentropic.Pt_by_P(NormalShock.DownStreamMachNumber(M1, gamma), gamma));
+        return (1 / (NormalShock.P2_by_P1(M1, gamma)) / Isentropic.Pt_by_P(NormalShock.downStreamMachNumber(M1, gamma), gamma));
     }
 }
 if (TEST_ISENTROPIC) {
     console.log("\nMach2 Normal Shock test");
-    console.log("M2 = ", NormalShock.DownStreamMachNumber(2, 1.4).toFixed(PRECISION));
+    console.log("M2 = ", NormalShock.downStreamMachNumber(2, 1.4).toFixed(PRECISION));
     console.log("P2/P1 = ", NormalShock.P2_by_P1(2, 1.4).toFixed(PRECISION));
     console.log("rho2/rho1 = ", NormalShock.RHO2_by_RHO1(2, 1.4).toFixed(PRECISION));
     console.log("T2/T1 = ", NormalShock.T2_by_T1(2, 1.4).toFixed(PRECISION));
@@ -94,4 +94,33 @@ if (TEST_ISENTROPIC) {
     console.log("Pt2/Pt1 = ", NormalShock.Pt2_by_Pt1(2, 1.4).toFixed(PRECISION));
     console.log("P1/Pt2 = ", NormalShock.P1_by_Pt2(2, 1.4).toFixed(PRECISION));
     console.log("Mach2 Normal Shock test complete\n");
+}
+class ObliqueShock {
+    static deflectionAngle(M1, beta, gamma) {
+        const num = 2 * (Math.cos(beta) / Math.sin(beta)) * (Math.pow(M1 * Math.sin(beta), 2) - 1);
+        const den = 2 + M1 * M1 * (gamma + Math.cos(2 * beta));
+        return Math.atan(num / den);
+    }
+    static downStreamMachNumber(M1, beta, gamma) {
+        const deflection = ObliqueShock.deflectionAngle(M1, beta, gamma);
+        const t0 = Math.pow(Math.sin(beta - deflection), 2);
+        const num = Math.pow(M1 * Math.sin(beta), 2) + (2 / (gamma - 1));
+        const den = (2 * gamma / (gamma - 1)) * Math.pow(M1 * Math.sin(beta), 2) - 1;
+        return Math.sqrt(num / (den * t0));
+    }
+    static P2_by_P1(M1, beta, gamma) {
+        const num = 2 * gamma * Math.pow(M1 * Math.sin(beta), 2) - (gamma - 1);
+        const den = gamma + 1;
+        return num / den;
+    }
+    static RHO2_by_RHO1(M1, beta, gamma) {
+        const num = (gamma + 1) * Math.pow(M1 * Math.sin(beta), 2);
+        const den = (gamma - 1) * Math.pow(M1 * Math.sin(beta), 2) + 2;
+        return num / den;
+    }
+    static T2_by_T1(M1, beta, gamma) {
+        const p2byb1 = ObliqueShock.P2_by_P1(M1, beta, gamma);
+        const rho2byrho1 = ObliqueShock.RHO2_by_RHO1(M1, beta, gamma);
+        return p2byb1 / rho2byrho1;
+    }
 }
