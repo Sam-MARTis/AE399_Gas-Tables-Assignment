@@ -1,8 +1,8 @@
 "use strict";
 const PRECISION = 5;
 const TEST_ISENTROPIC = false;
-const TEST_NORMAL_SHOCK = false;
-const TEST_OBLIQUE_SHOCK = true;
+const TEST_NORMAL_SHOCK = true;
+const TEST_OBLIQUE_SHOCK = false;
 const deflection_tolerance = 0.001;
 const epsilon = 0.00001;
 const epsilon_derivative = 0.001;
@@ -112,15 +112,31 @@ class NormalShock {
         return Math.sqrt(msq);
     }
 }
-if (TEST_ISENTROPIC) {
+if (TEST_NORMAL_SHOCK) {
     console.log("\nMach2 Normal Shock test");
-    console.log("M2 = ", NormalShock.downStreamMachNumber(2, 1.4).toFixed(PRECISION));
-    console.log("P2/P1 = ", NormalShock.P2_by_P1(2, 1.4).toFixed(PRECISION));
-    console.log("rho2/rho1 = ", NormalShock.RHO2_by_RHO1(2, 1.4).toFixed(PRECISION));
-    console.log("T2/T1 = ", NormalShock.T2_by_T1(2, 1.4).toFixed(PRECISION));
-    console.log("a2/a1 = ", NormalShock.a2_by_a1(2, 1.4).toFixed(PRECISION));
-    console.log("Pt2/Pt1 = ", NormalShock.Pt2_by_Pt1(2, 1.4).toFixed(PRECISION));
-    console.log("P1/Pt2 = ", NormalShock.P1_by_Pt2(2, 1.4).toFixed(PRECISION));
+    // console.log("M2 = ", NormalShock.downStreamMachNumber(2, 1.4).toFixed(PRECISION));
+    // console.log("P2/P1 = ", NormalShock.P2_by_P1(2, 1.4).toFixed(PRECISION));
+    // console.log("rho2/rho1 = ", NormalShock.RHO2_by_RHO1(2, 1.4).toFixed(PRECISION));
+    // console.log("T2/T1 = ", NormalShock.T2_by_T1(2, 1.4).toFixed(PRECISION));
+    // console.log("a2/a1 = ", NormalShock.a2_by_a1(2, 1.4).toFixed(PRECISION));
+    // console.log("Pt2/Pt1 = ", NormalShock.Pt2_by_Pt1(2, 1.4).toFixed(PRECISION));
+    // console.log("P1/Pt2 = ", NormalShock.P1_by_Pt2(2, 1.4).toFixed(PRECISION));
+    // console.log("Mach2 Normal Shock test complete\n")
+    const m1 = 2.0;
+    const gamma = 1.4;
+    const p2by1 = NormalShock.P2_by_P1(m1, gamma);
+    const rho2by1 = NormalShock.RHO2_by_RHO1(m1, gamma);
+    const t2by1 = NormalShock.T2_by_T1(m1, gamma);
+    const m2 = NormalShock.downStreamMachNumber(m1, gamma);
+    console.log("Given M1 = ", m1);
+    console.log("P2/P1 = ", p2by1.toFixed(PRECISION));
+    console.log("rho2/rho1 = ", rho2by1.toFixed(PRECISION));
+    console.log("T2/T1 = ", t2by1.toFixed(PRECISION));
+    console.log("M2 = ", m2.toFixed(PRECISION));
+    console.log("Testing inverse functions...");
+    console.log("M1 from P2/P1 = ", NormalShock.findM1From_P2_by_P1(p2by1, gamma).toFixed(PRECISION));
+    console.log("M1 from rho2/rho1 = ", NormalShock.findM1From_RHO2_by_RHO1(rho2by1, gamma).toFixed(PRECISION));
+    console.log("M1 from T2/T1 = ", NormalShock.findM1From_T2_by_T1(t2by1, gamma).toFixed(PRECISION));
     console.log("Mach2 Normal Shock test complete\n");
 }
 class ObliqueShock {
