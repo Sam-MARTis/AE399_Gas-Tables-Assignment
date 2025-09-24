@@ -34,20 +34,51 @@ class Isentropic {
         const tstar = this.tstar_by_t(M, gamma);
         return Math.pow(tstar, 1 / (gamma - 1));
     }
-    static A_by_Astar_pressure(M, gamma, p, p0) {
-        const gp = gamma + 1;
-        const gn = gamma - 1;
-        const pr = p / p0;
-        const num = Math.pow(2 / gp, 0.5 * gp / gn) * Math.pow(0.5 * gn, 0.5);
-        const den = Math.pow(Math.pow(pr, 2 / gamma) - Math.pow(pr, (gp) / gamma), 0.5);
-        return num / den;
-    }
+    // static A_by_Astar_pressure(M:number, gamma:number, p:number, p0:number):number{
+    //   const gp = gamma+1;
+    //   const gn = gamma-1;
+    //   const pr = p/p0;
+    //   const num = Math.pow(2/gp, 0.5 * gp/gn) * Math.pow(0.5 * gn, 0.5);
+    //   const den = Math.pow(Math.pow(pr, 2/gamma) - Math.pow(pr, (gp)/gamma), 0.5);
+    //   return num/den;
+    // }
     static A_by_Astar_mach(M, gamma) {
         const pow = (gamma + 1) / (2 * (gamma - 1));
         const t1 = (2 / (gamma + 1));
         const t2 = (1 + 0.5 * (gamma - 1) * M * M);
         const i1 = Math.pow(t1 * t2, pow);
         return i1 / M;
+    }
+    // Now for the inverse functions
+    static findMFrom_Tt_by_T(ratio, gamma) {
+        const m1sq = (2 / (gamma - 1)) * (ratio - 1);
+        return Math.sqrt(m1sq);
+    }
+    static findMFrom_Pt_by_P(ratio, gamma) {
+        const pow = (gamma - 1) / gamma;
+        const t_ratio = Math.pow(ratio, pow);
+        return Isentropic.findMFrom_Tt_by_T(t_ratio, gamma);
+    }
+    static findMFrom_rhot_by_rho(ratio, gamma) {
+        const pow = gamma - 1;
+        const t_ratio = Math.pow(ratio, pow);
+        return Isentropic.findMFrom_Tt_by_T(t_ratio, gamma);
+    }
+    static findMFrom_A_by_Astar_mach(ratio, gamma) {
+        // Numerical solution
+        let M = 0.9999; // Initial guess
+        for (let i = 0; i < 10000; i++) {
+            const f1 = Isentropic.A_by_Astar_mach(M, gamma);
+            const f2 = Isentropic.A_by_Astar_mach(M - epsilon_derivative, gamma);
+            const deriv_A_by_Astar = (f2 - f1) / epsilon_derivative;
+            const M_new = M - step * (ratio - f1) / deriv_A_by_Astar;
+            const new_ratio = Isentropic.A_by_Astar_mach(M_new, gamma);
+            if (Math.abs(new_ratio - ratio) < 0.00001) {
+                return M_new;
+            }
+            M = M_new;
+        }
+        throw new Error("Could not find Mach number from A/A*");
     }
 }
 class NormalShock {
