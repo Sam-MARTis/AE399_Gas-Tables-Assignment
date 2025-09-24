@@ -60,6 +60,11 @@ class NormalShock{
     const m2sq = (t1*m1sq + 2)/(2*gamma*m1sq - t1);
     return Math.sqrt(m2sq);
   }
+  static upStreamMachNumber(M2:number, gamma: number): number{
+    const num = (gamma-1) * M2*M2 + 2;
+    const den = 2*gamma*M2*M2 - (gamma -1);
+    return Math.sqrt(num/den);
+  }
   static P2_by_P1(M1:number, gamma:number):number {
     const m1sq = M1*M1;
     return (2*gamma*m1sq - (gamma - 1))/(gamma + 1);
@@ -91,8 +96,31 @@ class NormalShock{
   static P1_by_Pt2(M1:number, gamma:number):number {
     return (1/(NormalShock.P2_by_P1(M1, gamma)) / Isentropic.Pt_by_P(NormalShock.downStreamMachNumber(M1, gamma), gamma));
   }
-  
+
+  // to allow for user flexibility, we find M1 by various other things. Inverse functions, basically
+  // Need to manually calculate these
+  static findM1From_P2_by_P1(ratio:number, gamma:number):number{
+    const num = (gamma-1) + ratio * (gamma + 1);
+    const den = 2*gamma;
+    return Math.sqrt(num/den);
+  }
+  static findM1From_RHO2_by_RHO1(ratio:number, gamma:number):number{
+    const num = 2* ratio;
+    const den = (gamma + 1) - ratio * (gamma - 1);
+    return Math.sqrt(num/den);
+  }     
+  static findM1From_T2_by_T1(ratio:number, gamma:number):number{
+    const a = 2*gamma*(gamma-1);
+    const b = 4 * gamma -  (gamma -1)* (gamma -1)  - (gamma + 1) * (gamma + 1) * ratio;
+    const c = -2 * (gamma - 1);
+    const msq = (-b + Math.sqrt(b*b - 4*a*c))/(2*a);
+    return Math.sqrt(msq);
+  }                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                         
 }
+
+
+
 
 if(TEST_ISENTROPIC){
   console.log("\nMach2 Normal Shock test");
@@ -184,6 +212,25 @@ class ObliqueShock{
       P2_final = average;
     }
     return [P1_final, P2_final];
+  }
+  static findStrongWeakSolutions(M1:number, gamma:number, deflection:number):[number[], number[], number[], number[], number[]]{
+    const max_deflection = ObliqueShock.find_max_deflection_angle(M1, gamma);
+    if(deflection > max_deflection){
+      throw new Error("Deflection angle exceeds maximum deflection angle for given Mach number");
+    }
+    const betas = ObliqueShock.find_shock_angle_solutions(M1, gamma, deflection);
+    const M2s = [ObliqueShock.downStreamMachNumber(M1, betas[1], gamma), ObliqueShock.downStreamMachNumber(M1, betas[0], gamma)];
+    const P2_by_P1s = [ObliqueShock.P2_by_P1(M1, betas[1], gamma), ObliqueShock.P2_by_P1(M1, betas[0], gamma)];
+    const rho2_by_rho1s = [ObliqueShock.RHO2_by_RHO1(M1, betas[1], gamma), ObliqueShock.RHO2_by_RHO1(M1, betas[0], gamma)];
+    const T2_by_T1s = [ObliqueShock.T2_by_T1(M1, betas[1], gamma), ObliqueShock.T2_by_T1(M1, betas[0], gamma)];
+
+    return [betas, M2s, P2_by_P1s, rho2_by_rho1s, T2_by_T1s];
+  }
+  static normalMachs(M1:number, gamma:number, deflection:number):[[number, number], [number, number]]{
+    const betas = ObliqueShock.find_shock_angle_solutions(M1, gamma, deflection);
+    const M1n:[number, number] = [M1 * Math.sin(betas[0]), M1 * Math.sin(betas[1])];
+    const M2n:[number, number] = [ObliqueShock.downStreamMachNumber(M1, betas[0], gamma) * Math.sin(betas[0] - deflection), ObliqueShock.downStreamMachNumber(M1, betas[1], gamma) * Math.sin(betas[1] - deflection)];
+    return [M1n, M2n];
   }
 }
 
