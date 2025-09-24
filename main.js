@@ -1,12 +1,13 @@
 "use strict";
 const PRECISION = 5;
-const TEST_ISENTROPIC = false;
-const TEST_NORMAL_SHOCK = true;
+const TEST_ISENTROPIC = true;
+const TEST_NORMAL_SHOCK = false;
 const TEST_OBLIQUE_SHOCK = false;
 const deflection_tolerance = 0.001;
 const epsilon = 0.00001;
 const epsilon_derivative = 0.001;
 const step = 0.1;
+const max_M_step = 0.04;
 class Isentropic {
     static Tt_by_T(M, gamma) {
         return 1 + ((gamma - 1) * 0.5) * M * M;
@@ -64,14 +65,16 @@ class Isentropic {
         const t_ratio = Math.pow(ratio, pow);
         return Isentropic.findMFrom_Tt_by_T(t_ratio, gamma);
     }
-    static findMFrom_A_by_Astar_mach(ratio, gamma) {
+    static findMFrom_A_by_Astar_mach_subsonic(ratio, gamma) {
         // Numerical solution
         let M = 0.9999; // Initial guess
         for (let i = 0; i < 10000; i++) {
             const f1 = Isentropic.A_by_Astar_mach(M, gamma);
             const f2 = Isentropic.A_by_Astar_mach(M - epsilon_derivative, gamma);
             const deriv_A_by_Astar = (f2 - f1) / epsilon_derivative;
-            const M_new = M - step * (ratio - f1) / deriv_A_by_Astar;
+            let dM = step * (ratio - f1) / deriv_A_by_Astar;
+            dM = Math.min(dM, max_M_step);
+            const M_new = M - dM;
             const new_ratio = Isentropic.A_by_Astar_mach(M_new, gamma);
             if (Math.abs(new_ratio - ratio) < 0.00001) {
                 return M_new;
@@ -80,6 +83,43 @@ class Isentropic {
         }
         throw new Error("Could not find Mach number from A/A*");
     }
+    static findMFrom_A_by_Astar_mach_supersonic(ratio, gamma) {
+        // Numerical solution
+        let M = 1.0001; // Initial guess
+        for (let i = 0; i < 10000; i++) {
+            const f1 = Isentropic.A_by_Astar_mach(M, gamma);
+            const f2 = Isentropic.A_by_Astar_mach(M + epsilon_derivative, gamma);
+            const deriv_A_by_Astar = (f2 - f1) / epsilon_derivative;
+            let dM = step * (ratio - f1) / deriv_A_by_Astar;
+            dM = Math.min(dM, max_M_step);
+            const M_new = M + dM;
+            const new_ratio = Isentropic.A_by_Astar_mach(M_new, gamma);
+            if (Math.abs(new_ratio - ratio) < 0.00001) {
+                return M_new;
+            }
+            M = M_new;
+        }
+        throw new Error("Could not find Mach number from A/A*");
+    }
+}
+if (TEST_ISENTROPIC) {
+    console.log("\nIsentropic test");
+    const m1 = 0.4;
+    console.log("Tt/T = ", Isentropic.Tt_by_T(m1, 1.4).toFixed(PRECISION));
+    console.log("Pt/P = ", Isentropic.Pt_by_P(m1, 1.4).toFixed(PRECISION));
+    console.log("rhot/rho = ", Isentropic.rhot_by_rho(m1, 1.4).toFixed(PRECISION));
+    console.log("at/a = ", Isentropic.at_by_a(m1, 1.4).toFixed(PRECISION));
+    // console.log("A/A* = ", Isentropic.A_by_Astar_mach(m1, 1.4).toFixed(PRECISION));
+    const a_by_a_star = Isentropic.A_by_Astar_mach(m1, 1.4);
+    console.log("A/A* = ", a_by_a_star.toFixed(PRECISION));
+    console.log("M from Tt/T = ", Isentropic.findMFrom_Tt_by_T(Isentropic.Tt_by_T(m1, 1.4), 1.4).toFixed(PRECISION));
+    console.log("M from Pt/P = ", Isentropic.findMFrom_Pt_by_P(Isentropic.Pt_by_P(m1, 1.4), 1.4).toFixed(PRECISION));
+    console.log("M from rhot/rho = ", Isentropic.findMFrom_rhot_by_rho(Isentropic.rhot_by_rho(m1, 1.4), 1.4).toFixed(PRECISION));
+    const supersonic_mach_solution = Isentropic.findMFrom_A_by_Astar_mach_supersonic(a_by_a_star, 1.4);
+    console.log("M from A/A* subsonic = ", Isentropic.findMFrom_A_by_Astar_mach_subsonic(a_by_a_star, 1.4).toFixed(PRECISION));
+    console.log("M from A/A* supersonic = ", supersonic_mach_solution.toFixed(PRECISION));
+    console.log("A/A* for supersonic solution of A/A* = ", Isentropic.A_by_Astar_mach(supersonic_mach_solution, 1.4).toFixed(PRECISION));
+    console.log("Isentropic test complete\n");
 }
 class NormalShock {
     static downStreamMachNumber(M1, gamma) {
