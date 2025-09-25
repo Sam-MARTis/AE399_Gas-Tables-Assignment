@@ -103,6 +103,19 @@ class Isentropic{
     }
     throw new Error("Could not find Mach number from A/A*");
   }
+
+
+  static get_ouputs(M:number, gamma:number):{Tt_by_T:number, Pt_by_P:number, rhot_by_rho:number, at_by_a:number, tstar_by_t:number, pstar_by_p:number, rhostar_by_rho:number, A_by_Astar_mach:number}{
+    const Tt_by_t = Isentropic.Tt_by_T(M, gamma);
+    const Pt_by_p = Isentropic.Pt_by_P(M, gamma);
+    const rhot_by_rho = Isentropic.rhot_by_rho(M, gamma);
+    const at_by_a = Isentropic.at_by_a(M, gamma);
+    const tstar_by_t = Isentropic.tstar_by_t(M, gamma);
+    const pstar_by_p = Isentropic.pstar_by_p(M, gamma);
+    const rhostar_by_rho = Isentropic.rhostar_by_rho(M, gamma);
+    const A_by_Astar_mach = Isentropic.A_by_Astar_mach(M, gamma);
+    return {Tt_by_T: Tt_by_t, Pt_by_P: Pt_by_p, rhot_by_rho: rhot_by_rho, at_by_a: at_by_a, tstar_by_t: tstar_by_t, pstar_by_p: pstar_by_p, rhostar_by_rho: rhostar_by_rho, A_by_Astar_mach: A_by_Astar_mach};
+  }
 }
 
 if(TEST_ISENTROPIC){
@@ -195,6 +208,16 @@ class NormalShock{
   I'm not doing p02_by_p01. That's too much work - requires numerical solution.
   */
   
+  static get_ouputs(M1:number, gamma:number):{M2:number, P2_by_P1:number, RHO2_by_RHO1:number, T2_by_T1:number, a2_by_a1:number, Pt2_by_Pt1:number, P1_by_Pt2:number}{
+    const M2 = NormalShock.downStreamMachNumber(M1, gamma);
+    const P2_by_P1 = NormalShock.P2_by_P1(M1, gamma);
+    const RHO2_by_RHO1 = NormalShock.RHO2_by_RHO1(M1, gamma);
+    const T2_by_T1 = NormalShock.T2_by_T1(M1, gamma);
+    const a2_by_a1 = NormalShock.a2_by_a1(M1, gamma);
+    const Pt2_by_Pt1 = NormalShock.Pt2_by_Pt1(M1, gamma);
+    const P1_by_Pt2 = NormalShock.P1_by_Pt2(M1, gamma);
+    return {M2: M2, P2_by_P1: P2_by_P1, RHO2_by_RHO1: RHO2_by_RHO1, T2_by_T1: T2_by_T1, a2_by_a1: a2_by_a1, Pt2_by_Pt1: Pt2_by_Pt1, P1_by_Pt2: P1_by_Pt2};
+  }
                                                                                                                                                                                                                                                                                                          
 }
 
@@ -328,6 +351,18 @@ class ObliqueShock{
     const M1n:[number, number] = [M1 * Math.sin(betas[0]), M1 * Math.sin(betas[1])];
     const M2n:[number, number] = [ObliqueShock.downStreamMachNumber(M1, betas[0], gamma) * Math.sin(betas[0] - deflection), ObliqueShock.downStreamMachNumber(M1, betas[1], gamma) * Math.sin(betas[1] - deflection)];
     return [M1n, M2n];
+  }
+
+  static get_outputs(M1:number, beta:number, gamma:number):{M2:number, deflection: number, P2_by_P1:number, RHO2_by_RHO1:number, T2_by_T1:number, max_deflection: number}{
+
+    const M2 = ObliqueShock.downStreamMachNumber(M1, beta, gamma);
+    const deflection = ObliqueShock.deflectionAngle(M1, beta, gamma);
+    const P2_by_P1 = ObliqueShock.P2_by_P1(M1, beta, gamma);
+    const RHO2_by_RHO1 = ObliqueShock.RHO2_by_RHO1(M1, beta, gamma);
+    const T2_by_T1 = ObliqueShock.T2_by_T1(M1, beta, gamma);
+    const max_deflection = ObliqueShock.find_max_deflection_angle(M1, gamma);
+
+    return {M2, deflection, P2_by_P1, RHO2_by_RHO1, T2_by_T1, max_deflection};
   }
 }
 
