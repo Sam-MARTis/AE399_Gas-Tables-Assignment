@@ -380,4 +380,17 @@ if(TEST_OBLIQUE_SHOCK){
 }
 
 
+class Input_Output_Handler{
+  static isentropic_input_number = document.getElementById("input_isentropic_number");
+  static isentropic_input_type = document.getElementById("isentropic_input_type");
+  static isentropic_output_area = document.getElementById("isentropic_output_area");
 
+  static normalshock_input_number = document.getElementById("input_normalshock_number");
+  static normalshock_input_type = document.getElementById("normalshock_input_type")
+  static normalshock_output_area = document.getElementById("normalshock_output_area");
+  
+  static obliqueshock_input_M = document.getElementById("input_obliqueshock_M")
+  static obliqueshock_input_2 = document.getElementById("input_obliqueshock_2")
+  static obliqueshock_input_2_type = document.getElementById("obliqueshock_input_2_type")
+  static obliqueshock_output_area = document.getElementById("obliqueshock_output_area")
+}

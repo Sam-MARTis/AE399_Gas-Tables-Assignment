@@ -349,3 +349,15 @@ if (TEST_OBLIQUE_SHOCK) {
     console.log("Weak Shock Angle (deg) = ", (beta_weak * 180 / Math.PI).toFixed(PRECISION));
     console.log("Strong Shock Angle (deg) = ", (beta_strong * 180 / Math.PI).toFixed(PRECISION));
 }
+class Input_Output_Handler {
+}
+Input_Output_Handler.isentropic_input_number = document.getElementById("input_isentropic_number");
+Input_Output_Handler.isentropic_input_type = document.getElementById("isentropic_input_type");
+Input_Output_Handler.isentropic_output_area = document.getElementById("isentropic_output_area");
+Input_Output_Handler.normalshock_input_number = document.getElementById("input_normalshock_number");
+Input_Output_Handler.normalshock_input_type = document.getElementById("normalshock_input_type");
+Input_Output_Handler.normalshock_output_area = document.getElementById("normalshock_output_area");
+Input_Output_Handler.obliqueshock_input_M = document.getElementById("input_obliqueshock_M");
+Input_Output_Handler.obliqueshock_input_2 = document.getElementById("input_obliqueshock_2");
+Input_Output_Handler.obliqueshock_input_2_type = document.getElementById("obliqueshock_input_2_type");
+Input_Output_Handler.obliqueshock_output_area = document.getElementById("obliqueshock_output_area");
