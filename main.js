@@ -50,6 +50,12 @@ class Isentropic {
         const i1 = Math.pow(t1 * t2, pow);
         return i1 / M;
     }
+    static prandtlMeyerAngle(M, gamma) {
+        const t1 = Math.sqrt((gamma + 1) / (gamma - 1));
+        const t2 = Math.atan(Math.sqrt(M * M - 1) / t1);
+        const t3 = Math.atan(Math.sqrt(M * M - 1));
+        return t1 * t2 - t3;
+    }
     // Now for the inverse functions
     static findMFrom_Tt_by_T(ratio, gamma) {
         const m1sq = (2 / (gamma - 1)) * (ratio - 1);
@@ -110,7 +116,8 @@ class Isentropic {
         const pstar_by_p = Isentropic.pstar_by_p(M, gamma);
         const rhostar_by_rho = Isentropic.rhostar_by_rho(M, gamma);
         const A_by_Astar_mach = Isentropic.A_by_Astar_mach(M, gamma);
-        return { Tt_by_T: Tt_by_t, Pt_by_P: Pt_by_p, rhot_by_rho: rhot_by_rho, at_by_a: at_by_a, tstar_by_t: tstar_by_t, pstar_by_p: pstar_by_p, rhostar_by_rho: rhostar_by_rho, A_by_Astar_mach: A_by_Astar_mach };
+        const prandtl_meyer_angle = Isentropic.prandtlMeyerAngle(M, gamma);
+        return { Tt_by_T: Tt_by_t, Pt_by_P: Pt_by_p, rhot_by_rho: rhot_by_rho, at_by_a: at_by_a, tstar_by_t: tstar_by_t, pstar_by_p: pstar_by_p, rhostar_by_rho: rhostar_by_rho, A_by_Astar_mach: A_by_Astar_mach, prandtl_meyer_angle: prandtl_meyer_angle };
     }
 }
 if (TEST_ISENTROPIC) {
@@ -406,7 +413,8 @@ at/a = ${results.at_by_a.toFixed(5)}
 T*/T = ${results.tstar_by_t.toFixed(5)}
 P*/P = ${results.pstar_by_p.toFixed(5)}
 ρ*/ρ = ${results.rhostar_by_rho.toFixed(5)}
-A/A* = ${results.A_by_Astar_mach.toFixed(5)}`;
+A/A* = ${results.A_by_Astar_mach.toFixed(5)}
+Prandtl-Meyer Angle = ${(results.prandtl_meyer_angle * 180 / Math.PI).toFixed(5)}°`;
     }
     catch (error) {
         output.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
