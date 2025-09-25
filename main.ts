@@ -394,3 +394,168 @@ class Input_Output_Handler{
   static obliqueshock_input_2_type = document.getElementById("obliqueshock_input_2_type")
   static obliqueshock_output_area = document.getElementById("obliqueshock_output_area")
 }
+
+function calculateIsentropic() {
+  const input = (document.getElementById("input_isentropic_number") as HTMLInputElement).value;
+  const type = (document.getElementById("isentropic_input_type") as HTMLSelectElement).value;
+  const output = document.getElementById("isentropic_output_area") as HTMLDivElement;
+  
+  if (!input) {
+    output.textContent = "Please enter a value";
+    return;
+  }
+  
+  const value_input = parseFloat(input);
+  const gamma = 1.4;
+  
+  try {
+    let mach: number;
+    switch(type) {
+      case "Mach":
+        mach = value_input;
+        break;
+      case "Tt_by_T":
+        mach = Isentropic.findMFrom_Tt_by_T(value_input, gamma);
+        break;
+      case "Pt_by_P":
+        mach = Isentropic.findMFrom_Pt_by_P(value_input, gamma);
+        break;
+      case "rhot_by_rho":
+        mach = Isentropic.findMFrom_rhot_by_rho(value_input, gamma);
+        break;
+      case "A_by_Astar_sub":
+        mach = Isentropic.findMFrom_A_by_Astar_mach_subsonic(value_input, gamma);
+        break;
+      case "A_by_Astar_sup":
+        mach = Isentropic.findMFrom_A_by_Astar_mach_supersonic(value_input, gamma);
+        break;
+      default:
+        throw new Error("Invalid input type");
+    }
+    
+    const results = Isentropic.get_ouputs(mach, gamma);
+    output.textContent = `Mach Number: ${mach.toFixed(5)}
+    
+All Isentropic Relations:
+Tt/T = ${results.Tt_by_T.toFixed(5)}
+Pt/P = ${results.Pt_by_P.toFixed(5)}
+ρt/ρ = ${results.rhot_by_rho.toFixed(5)}
+at/a = ${results.at_by_a.toFixed(5)}
+T*/T = ${results.tstar_by_t.toFixed(5)}
+P*/P = ${results.pstar_by_p.toFixed(5)}
+ρ*/ρ = ${results.rhostar_by_rho.toFixed(5)}
+A/A* = ${results.A_by_Astar_mach.toFixed(5)}`;
+    
+  } catch (error) {
+    output.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
+  }
+}
+
+function calculateNormalShock() {
+  const input = (document.getElementById("input_normalshock_number") as HTMLInputElement).value;
+  const type = (document.getElementById("normalshock_input_type") as HTMLSelectElement).value;
+  const output = document.getElementById("normalshock_output_area") as HTMLDivElement;
+  
+  if (!input) {
+    output.textContent = "Please enter a value";
+    return;
+  }
+  
+  const user_input = parseFloat(input);
+  const gamma = 1.4;
+  
+  try {
+    let m1: number;
+    switch(type) {
+      case "Mach_Up":
+        m1 = user_input;
+        break;
+      case "Mach_Down":
+        m1 = NormalShock.upStreamMachNumber(user_input, gamma);
+        break;
+      case "P2_by_P1":
+        m1 = NormalShock.findM1From_P2_by_P1(user_input, gamma);
+        break;
+      case "RHO2_by_RHO1":
+        m1 = NormalShock.findM1From_RHO2_by_RHO1(user_input, gamma);
+        break;
+      case "T2_by_T1":
+        m1 = NormalShock.findM1From_T2_by_T1(user_input, gamma);
+        break;
+      default:
+        throw new Error("Invalid input type");
+    }
+    
+    const results = NormalShock.get_ouputs(m1, gamma);
+    output.textContent = `Upstream Mach (M1): ${m1.toFixed(5)}
+
+All Normal Shock Relations:
+M2 = ${results.M2.toFixed(5)}
+P2/P1 = ${results.P2_by_P1.toFixed(5)}
+ρ2/ρ1 = ${results.RHO2_by_RHO1.toFixed(5)}
+T2/T1 = ${results.T2_by_T1.toFixed(5)}
+a2/a1 = ${results.a2_by_a1.toFixed(5)}
+Pt2/Pt1 = ${results.Pt2_by_Pt1.toFixed(5)}
+P1/Pt2 = ${results.P1_by_Pt2.toFixed(5)}`;
+    
+  } catch (error) {
+    output.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
+  }
+}
+
+function calculateObliqueShock() {
+  const m1Input = (document.getElementById("input_obliqueshock_M") as HTMLInputElement).value;
+  const secondInput = (document.getElementById("input_obliqueshock_2") as HTMLInputElement).value;
+  const type = (document.getElementById("obliqueshock_input_2_type") as HTMLSelectElement).value;
+  const output = document.getElementById("obliqueshock_output_area") as HTMLDivElement;
+  
+  if (!m1Input || !secondInput) {
+    output.textContent = "Please enter both values";
+    return;
+  }
+  
+  const m1 = parseFloat(m1Input);
+  const secondValue = parseFloat(secondInput);
+  const gamma = 1.4;
+  
+  try {
+    if (type === "beta") {
+      const beta = secondValue * Math.PI / 180;
+      const results = ObliqueShock.get_outputs(m1, beta, gamma);
+      output.textContent = `Oblique Shock Results:
+M1 = ${m1.toFixed(5)}
+Beta (shock angle) = ${secondValue.toFixed(2)}°
+Deflection angle = ${(results.deflection * 180 / Math.PI).toFixed(5)}°
+
+M2 = ${results.M2.toFixed(5)}
+P2/P1 = ${results.P2_by_P1.toFixed(5)}
+ρ2/ρ1 = ${results.RHO2_by_RHO1.toFixed(5)}
+T2/T1 = ${results.T2_by_T1.toFixed(5)}
+Max deflection = ${(results.max_deflection * 180 / Math.PI).toFixed(5)}°`;
+      
+    } else if (type === "deflection") {
+      const deflection = secondValue * Math.PI / 180;
+      const [betas, M2s, P2_by_P1s, rho2_by_rho1s, T2_by_T1s] = ObliqueShock.findStrongWeakSolutions(m1, gamma, deflection);
+      output.textContent = `Oblique Shock Solutions:
+M1 = ${m1.toFixed(5)}
+Deflection angle = ${secondValue.toFixed(2)}°
+
+Weak Solution:
+Beta = ${(betas[0] * 180 / Math.PI).toFixed(5)}°
+M2 = ${M2s[0].toFixed(5)}
+P2/P1 = ${P2_by_P1s[0].toFixed(5)}
+ρ2/ρ1 = ${rho2_by_rho1s[0].toFixed(5)}
+T2/T1 = ${T2_by_T1s[0].toFixed(5)}
+
+Strong Solution:
+Beta = ${(betas[1] * 180 / Math.PI).toFixed(5)}°
+M2 = ${M2s[1].toFixed(5)}
+P2/P1 = ${P2_by_P1s[1].toFixed(5)}
+ρ2/ρ1 = ${rho2_by_rho1s[1].toFixed(5)}
+T2/T1 = ${T2_by_T1s[1].toFixed(5)}`;
+    }
+    
+  } catch (error) {
+    output.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
+  }
+}
