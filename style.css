@@ -5,91 +5,92 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
     color: #333;
-    line-height: 1.6;
+    padding: 20px;
 }
 
 .container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 h1 {
     text-align: center;
-    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.gamma-section {
+    text-align: center;
     margin-bottom: 30px;
-    font-size: 2.2em;
+    padding: 10px;
+    background: #f0f0f0;
+    border-radius: 3px;
 }
 
 .section {
-    margin-bottom: 30px;
-    padding: 20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #fafafa;
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
 }
 
 h2 {
-    color: #34495e;
-    margin-bottom: 15px;
-    font-size: 1.4em;
+    margin-bottom: 10px;
+    font-size: 18px;
 }
 
 .input-group {
     display: flex;
-    gap: 10px;
-    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
-    margin-bottom: 15px;
 }
 
 select, input, button {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
     font-size: 14px;
 }
 
 select {
-    min-width: 200px;
-    background: white;
+    min-width: 180px;
 }
 
 input {
     flex: 1;
-    min-width: 150px;
+    min-width: 100px;
 }
 
 button {
-    background: #3498db;
+    background: #007acc;
     color: white;
     cursor: pointer;
     border: none;
-    min-width: 80px;
-    transition: background 0.3s;
 }
 
 button:hover {
-    background: #2980b9;
+    background: #005999;
 }
 
 .output {
-    background: #ecf0f1;
-    padding: 15px;
-    border-radius: 4px;
-    border-left: 4px solid #3498db;
-    font-family: 'Courier New', monospace;
+    background: #f8f8f8;
+    padding: 10px;
+    border-radius: 2px;
+    border: 1px solid #eee;
+    font-family: monospace;
     white-space: pre-line;
-    min-height: 60px;
+    font-size: 13px;
 }
 
 label {
     font-weight: bold;
-    min-width: 30px;
+    margin-right: 5px;
 }

@@ -413,7 +413,7 @@ function calculateIsentropic() {
   }
   
   const value_input = parseFloat(input);
-  const gamma = 1.4;
+  const gamma = parseFloat((document.getElementById("gamma_input") as HTMLInputElement).value) || 1.4;
   
   try {
     let mach: number;
@@ -470,7 +470,7 @@ function calculateNormalShock() {
   }
   
   const user_input = parseFloat(input);
-  const gamma = 1.4;
+  const gamma = parseFloat((document.getElementById("gamma_input") as HTMLInputElement).value) || 1.4;
   
   try {
     let m1: number;
@@ -524,7 +524,7 @@ function calculateObliqueShock() {
   
   const m1 = parseFloat(m1Input);
   const secondValue = parseFloat(secondInput);
-  const gamma = 1.4;
+  const gamma = parseFloat((document.getElementById("gamma_input") as HTMLInputElement).value) || 1.4;
   
   try {
     if (type === "beta") {
