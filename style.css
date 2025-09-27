@@ -6,44 +6,47 @@
 
 body {
     font-family: Arial, sans-serif;
-    background: #f9f9f9;
-    color: #333;
+    background: #1a1a1a;
+    color: #e0e0e0;
     padding: 20px;
 }
 
 .container {
     max-width: 700px;
     margin: 0 auto;
-    background: white;
+    background: #2d2d2d;
     padding: 20px;
     border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 h1 {
     text-align: center;
     margin-bottom: 20px;
     font-size: 24px;
+    color: #ffffff;
 }
 
 .gamma-section {
     text-align: center;
     margin-bottom: 30px;
     padding: 10px;
-    background: #f0f0f0;
+    background: #3a3a3a;
     border-radius: 3px;
 }
 
 .section {
     margin-bottom: 20px;
     padding: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #555;
     border-radius: 3px;
+    background: #333;
 }
 
 h2 {
     margin-bottom: 10px;
     font-size: 18px;
+    color: #ffffff;
 }
 
 .input-group {
@@ -55,9 +58,11 @@ h2 {
 
 select, input, button {
     padding: 5px 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #555;
     border-radius: 2px;
     font-size: 14px;
+    background: #404040;
+    color: #e0e0e0;
 }
 
 select {
@@ -70,27 +75,29 @@ input {
 }
 
 button {
-    background: #007acc;
+    background: #0066cc;
     color: white;
     cursor: pointer;
     border: none;
 }
 
 button:hover {
-    background: #005999;
+    background: #0052a3;
 }
 
 .output {
-    background: #f8f8f8;
+    background: #262626;
     padding: 10px;
     border-radius: 2px;
-    border: 1px solid #eee;
+    border: 1px solid #444;
     font-family: monospace;
     white-space: pre-line;
     font-size: 13px;
+    color: #f0f0f0;
 }
 
 label {
     font-weight: bold;
     margin-right: 5px;
+    color: #e0e0e0;
 }
