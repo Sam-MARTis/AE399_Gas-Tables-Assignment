@@ -13,6 +13,10 @@
         <div class="gamma-section">
             <label>Gamma (γ):</label>
             <input type="number" id="gamma_input" value="1.4" step="0.01" min="1">
+            <label>Precision:</label>
+            <input type="number" id="precision_input" value="5" step="1" min="1">
+            <label>Tolerance:</label>
+            <input type="number" id="tolerance_input" value="0.0001" step="any" min="0">
         </div>
         
         <div class="section">
@@ -41,6 +45,7 @@
                     <option value="Mach_Down">M2</option>
                     <option value="P2_by_P1">P2/P1</option>
                     <option value="Pt2_by_Pt1">Pt2/Pt1</option>
+                    <option value="P1_by_Pt2">P1/Pt2</option>
                     <option value="RHO2_by_RHO1">ρ2/ρ1</option>
                     <option value="T2_by_T1">T2/T1</option>
                 </select>
@@ -58,6 +63,7 @@
                 <select id="obliqueshock_input_2_type">
                     <option value="beta">Beta (shock angle)</option>
                     <option value="deflection">Deflection angle</option>
+                    <option value="M1n">M1n (normal component of M1)</option>
                 </select>
                 <input type="number" id="input_obliqueshock_2" placeholder="Enter angle (degrees)" step="any">
                 <button onclick="calculateObliqueShock()">Calculate</button>
