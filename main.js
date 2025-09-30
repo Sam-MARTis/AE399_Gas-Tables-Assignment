@@ -358,7 +358,7 @@ class ObliqueShock {
         const rho2byrho1 = ObliqueShock.RHO2_by_RHO1(M1, beta, gamma);
         return p2byb1 / rho2byrho1;
     }
-    static find_beta_from_M1_and_M1n1(M1, Mn1) {
+    static find_beta_from_M1_and_M1n(M1, Mn1) {
         return Math.asin(Mn1 / M1);
     }
     static find_max_deflection_angle(M1, gamma) {
@@ -407,7 +407,7 @@ class ObliqueShock {
             P1_final = average;
             P2_final = average;
         }
-        return [P1_final, P2_final];
+        return [P1_final, P2_final]; // [ Strong first, weak second]
     }
     static findStrongWeakSolutions(M1, gamma, deflection) {
         const max_deflection = ObliqueShock.find_max_deflection_angle(M1, gamma);
@@ -416,20 +416,20 @@ class ObliqueShock {
         }
         const betas = ObliqueShock.find_shock_angle_solutions(M1, gamma, deflection);
         const M2s = [
-            ObliqueShock.downStreamMachNumber(M1, betas[1], gamma),
             ObliqueShock.downStreamMachNumber(M1, betas[0], gamma),
+            ObliqueShock.downStreamMachNumber(M1, betas[1], gamma),
         ];
         const P2_by_P1s = [
-            ObliqueShock.P2_by_P1(M1, betas[1], gamma),
             ObliqueShock.P2_by_P1(M1, betas[0], gamma),
+            ObliqueShock.P2_by_P1(M1, betas[1], gamma),
         ];
         const rho2_by_rho1s = [
-            ObliqueShock.RHO2_by_RHO1(M1, betas[1], gamma),
             ObliqueShock.RHO2_by_RHO1(M1, betas[0], gamma),
+            ObliqueShock.RHO2_by_RHO1(M1, betas[1], gamma),
         ];
         const T2_by_T1s = [
-            ObliqueShock.T2_by_T1(M1, betas[1], gamma),
             ObliqueShock.T2_by_T1(M1, betas[0], gamma),
+            ObliqueShock.T2_by_T1(M1, betas[1], gamma),
         ];
         return [betas, M2s, P2_by_P1s, rho2_by_rho1s, T2_by_T1s];
     }
@@ -610,12 +610,19 @@ function calculateObliqueShock() {
     updatePrecision();
     updateTolerance();
     try {
-        if (type === "beta") {
-            const beta = (secondValue * Math.PI) / 180;
+        if ((type === "beta") || (type === "M1n")) {
+            let beta;
+            if (type === "M1n") {
+                beta = ObliqueShock.find_beta_from_M1_and_M1n(m1, secondValue);
+            }
+            else {
+                beta = (secondValue * Math.PI) / 180;
+            }
             const results = ObliqueShock.get_outputs(m1, beta, γ);
             output.textContent = `Oblique Shock Results:
 M1 = ${m1.toFixed(PRECISION)}
-Beta (shock angle) = ${secondValue.toFixed(2)}°
+M1n = ${(m1 * Math.sin(beta)).toFixed(PRECISION)}
+Beta (shock angle) = ${(beta * 180 / Math.PI).toFixed(PRECISION)}°
 Deflection angle = ${((results.deflection * 180) / Math.PI).toFixed(PRECISION)}°
 
 M2 = ${results.M2.toFixed(PRECISION)}
@@ -629,17 +636,19 @@ Max deflection = ${((results.max_deflection * 180) / Math.PI).toFixed(PRECISION)
             const [betas, M2s, P2_by_P1s, rho2_by_rho1s, T2_by_T1s] = ObliqueShock.findStrongWeakSolutions(m1, γ, deflection);
             output.textContent = `Oblique Shock Solutions:
 M1 = ${m1.toFixed(PRECISION)}
-Deflection angle = ${secondValue.toFixed(2)}°
+Deflection angle = ${secondValue.toFixed(PRECISION)}°
 
-Weak Solution:
+Strong Solution:
 Beta = ${((betas[0] * 180) / Math.PI).toFixed(PRECISION)}°
+M1n = ${(m1 * Math.sin(betas[0])).toFixed(PRECISION)}
 M2 = ${M2s[0].toFixed(PRECISION)}
 P2/P1 = ${P2_by_P1s[0].toFixed(PRECISION)}
 ρ2/ρ1 = ${rho2_by_rho1s[0].toFixed(PRECISION)}
 T2/T1 = ${T2_by_T1s[0].toFixed(PRECISION)}
 
-Strong Solution:
+Weak Solution:
 Beta = ${((betas[1] * 180) / Math.PI).toFixed(PRECISION)}°
+M1n = ${(m1 * Math.sin(betas[1])).toFixed(PRECISION)}
 M2 = ${M2s[1].toFixed(PRECISION)}
 P2/P1 = ${P2_by_P1s[1].toFixed(PRECISION)}
 ρ2/ρ1 = ${rho2_by_rho1s[1].toFixed(PRECISION)}
