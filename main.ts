@@ -249,7 +249,7 @@ class NormalShock{
         }
         last_exceeded = false;
       }
-      M += dM;
+      M -= dM;
 
 
     }
