@@ -75,14 +75,14 @@ input {
 }
 
 button {
-    background: #0066cc;
+    background: #4e4e4e;
     color: white;
     cursor: pointer;
     border: none;
 }
 
 button:hover {
-    background: #0052a3;
+    background: #edeff1;
 }
 
 .output {

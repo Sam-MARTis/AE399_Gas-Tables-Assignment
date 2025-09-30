@@ -4,11 +4,18 @@ const TEST_ISENTROPIC = true;
 const TEST_NORMAL_SHOCK = false;
 const TEST_OBLIQUE_SHOCK = false;
 const deflection_tolerance = 0.001;
+const tolerance = 0.0001;
 const epsilon = 0.00001;
 const epsilon_derivative = 0.001;
 const step = 0.1;
 const max_M_step = 0.04;
 class Isentropic {
+    static getMachAngle(M) {
+        if (M >= 1) {
+            return Math.asin(1 / M);
+        }
+        return NaN;
+    }
     static Tt_by_T(M, gamma) {
         return 1 + ((gamma - 1) * 0.5) * M * M;
     }
@@ -57,6 +64,9 @@ class Isentropic {
         return t1 * t2 - t3;
     }
     // Now for the inverse functions
+    static findMFromMachAngle(angle, gamma) {
+        return 1 / Math.sin(angle);
+    }
     static findMFrom_Tt_by_T(ratio, gamma) {
         const m1sq = (2 / (gamma - 1)) * (ratio - 1);
         return Math.sqrt(m1sq);
@@ -82,7 +92,7 @@ class Isentropic {
             dM = Math.min(dM, max_M_step);
             const M_new = M - dM;
             const new_ratio = Isentropic.A_by_Astar_mach(M_new, gamma);
-            if (Math.abs(new_ratio - ratio) < 0.00001) {
+            if (Math.abs(new_ratio - ratio) < tolerance) {
                 return M_new;
             }
             M = M_new;
@@ -100,7 +110,7 @@ class Isentropic {
             dM = Math.min(dM, max_M_step);
             const M_new = M + dM;
             const new_ratio = Isentropic.A_by_Astar_mach(M_new, gamma);
-            if (Math.abs(new_ratio - ratio) < 0.00001) {
+            if (Math.abs(new_ratio - ratio) < tolerance) {
                 return M_new;
             }
             M = M_new;
@@ -108,6 +118,11 @@ class Isentropic {
         throw new Error("Could not find Mach number from A/A*");
     }
     static get_ouputs(M, gamma) {
+        // let mach_angle = NaN
+        // if(M >= 1){
+        //   mach_angle = Math.asin(1/M);
+        // }
+        const mach_angle = Isentropic.getMachAngle(M);
         const Tt_by_t = Isentropic.Tt_by_T(M, gamma);
         const Pt_by_p = Isentropic.Pt_by_P(M, gamma);
         const rhot_by_rho = Isentropic.rhot_by_rho(M, gamma);
@@ -117,7 +132,7 @@ class Isentropic {
         const rhostar_by_rho = Isentropic.rhostar_by_rho(M, gamma);
         const A_by_Astar_mach = Isentropic.A_by_Astar_mach(M, gamma);
         const prandtl_meyer_angle = Isentropic.prandtlMeyerAngle(M, gamma);
-        return { Tt_by_T: Tt_by_t, Pt_by_P: Pt_by_p, rhot_by_rho: rhot_by_rho, at_by_a: at_by_a, tstar_by_t: tstar_by_t, pstar_by_p: pstar_by_p, rhostar_by_rho: rhostar_by_rho, A_by_Astar_mach: A_by_Astar_mach, prandtl_meyer_angle: prandtl_meyer_angle };
+        return { mach_angle: mach_angle, Tt_by_T: Tt_by_t, Pt_by_P: Pt_by_p, rhot_by_rho: rhot_by_rho, at_by_a: at_by_a, tstar_by_t: tstar_by_t, pstar_by_p: pstar_by_p, rhostar_by_rho: rhostar_by_rho, A_by_Astar_mach: A_by_Astar_mach, prandtl_meyer_angle: prandtl_meyer_angle };
     }
 }
 if (TEST_ISENTROPIC) {
@@ -199,6 +214,31 @@ class NormalShock {
         const c = -2 * (gamma - 1);
         const msq = (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
         return Math.sqrt(msq);
+    }
+    static findM1FromPt2_by_Pt1(ratio, gamma) {
+        let M = 1.0;
+        let dM = max_M_step;
+        let last_exceeded = false;
+        for (let i = 0; i < 10000; i++) {
+            const f1 = NormalShock.Pt2_by_Pt1(M, gamma);
+            if (Math.abs(f1 - ratio) < tolerance) {
+                return M;
+            }
+            if (f1 > ratio) {
+                if (last_exceeded == false) {
+                    dM *= -1 / 2;
+                }
+                last_exceeded = true;
+            }
+            else {
+                if (last_exceeded == true) {
+                    dM *= -1 / 2;
+                }
+                last_exceeded = false;
+            }
+            M += dM;
+        }
+        return M;
     }
     /*
     I'm not doing p02_by_p01. That's too much work - requires numerical solution.
@@ -384,6 +424,9 @@ function calculateIsentropic() {
             case "Mach":
                 mach = value_input;
                 break;
+            case "Mach_Angle":
+                mach = Isentropic.findMFromMachAngle(value_input * Math.PI / 180, gamma);
+                break;
             case "Tt_by_T":
                 mach = Isentropic.findMFrom_Tt_by_T(value_input, gamma);
                 break;
@@ -406,6 +449,7 @@ function calculateIsentropic() {
         output.textContent = `Mach Number: ${mach.toFixed(5)}
     
 All Isentropic Relations:
+Mach Angle = ${isNaN(results.mach_angle) ? "N/A (Subsonic)" : (results.mach_angle * 180 / Math.PI).toFixed(5) + "°"}
 Tt/T = ${results.Tt_by_T.toFixed(5)}
 Pt/P = ${results.Pt_by_P.toFixed(5)}
 ρt/ρ = ${results.rhot_by_rho.toFixed(5)}
@@ -441,6 +485,9 @@ function calculateNormalShock() {
                 break;
             case "P2_by_P1":
                 m1 = NormalShock.findM1From_P2_by_P1(user_input, gamma);
+                break;
+            case "Pt2_by_Pt1":
+                m1 = NormalShock.findM1FromPt2_by_Pt1(user_input, gamma);
                 break;
             case "RHO2_by_RHO1":
                 m1 = NormalShock.findM1From_RHO2_by_RHO1(user_input, gamma);
