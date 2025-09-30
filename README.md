@@ -8,6 +8,8 @@ Find the code and repository here: [https://github.com/Sam-MARTis/AE399_Gas-Tabl
 
 **Try the demo**: **[https://sam-martis.github.io/AE399_Gas-Tables-Assignment/](https://sam-martis.github.io/AE399_Gas-Tables-Assignment/)**
 
+
+Note, the report is in the repository [FinalReport_23B0046.pdf](FinalReport_23B0046.pdf)
 ![Image of the calculator](image.png)
 
 
